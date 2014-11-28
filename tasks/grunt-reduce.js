@@ -40,8 +40,11 @@ var defaults = {
     ]
 };
 
-module.exports = function (grunt) {
+function normalizeLocaleId (localeId) {
+    return localeId && localeId.replace(/-/g, '_').toLowerCase();
+}
 
+module.exports = function (grunt) {
 
     grunt.registerMultiTask('reduce', 'inline page and all it\'s assets', function () {
         var done = this.async();
@@ -61,10 +64,7 @@ module.exports = function (grunt) {
         // Support for locales
         var localeIds;
         if (Array.isArray(config.locales)) {
-            localeIds = config.locales.map(function (localeId) {
-                // Normalize localeId
-                return localeId && localeId.replace(/-/g, '_').toLowerCase();
-            });
+            localeIds = config.locales.map(normalizeLocaleId);
         }
 
         new AssetGraph({ root: rootUrl })
