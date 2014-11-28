@@ -1,4 +1,4 @@
-/*jshint onevar:false*/
+/*jshint onevar:false, node:true*/
 
 /*
  * grunt-reduce
@@ -8,9 +8,42 @@
  * Licensed under the MIT license.
  */
 
+var defaults = {
+    root : 'app',
+    outRoot : 'dist',
+    manifest : false,
+    pretty : false,
+    less : false,
+    scss : false,
+    inlineSize: Number.MAX_VALUE,
+    inlineByRelationType : {
+        "*" : true,
+        "CssImage" : Number.MAX_VALUE,
+        "HtmlScript" : Number.MAX_VALUE,
+        "HtmlImage" : Number.MAX_VALUE,
+        "Css" : Number.MAX_VALUE
+    },
+    optimizeImages: true,
+    sharedBundles : false,
+    asyncScripts : false,
+    loadAssets : [
+        '*.html',
+        '.htaccess',
+        '*.txt',
+        '*.ico'
+    ],
+    browsers : [
+        '> 1%',
+        'last 2 versions',
+        'Firefox ESR',
+        'Opera 12.1'
+    ]
+};
+
 module.exports = function (grunt) {
 
-    grunt.registerMultiTask('reduce', 'Description', function () {
+
+    grunt.registerMultiTask('reduce', 'inline page and all it\'s assets', function () {
         var done = this.async();
 
         var AssetGraph = require('assetgraph-builder'),
@@ -18,17 +51,12 @@ module.exports = function (grunt) {
             urlTools = require('urltools'),
             chalk = require('chalk');
 
-        var config = this.options(),
-            rootUrl = urlTools.fsDirToFileUrl(config.root || 'app'),
-            outRoot = urlTools.fsDirToFileUrl(config.outRoot || 'dist'),
+        var config = this.options(defaults),
+            rootUrl = urlTools.fsDirToFileUrl(config.root),
+            outRoot = urlTools.fsDirToFileUrl(config.outRoot),
             cdnRoot = config.cdnRoot && urlTools.ensureTrailingSlash(config.cdnRoot),
             cdnOutRoot = config.cdnOutRoot && urlTools.fsDirToFileUrl(config.cdnOutRoot),
-            canonicalUrl = config.canonicalUrl && urlTools.ensureTrailingSlash(config.canonicalUrl),
-            optimizeImages = config.optimizeImages === false ? false : true,
-            less = config.less === false ? false : true,
-            scss = config.scss === false ? false : true,
-            asyncScripts = config.asyncScripts === false ? false : true,
-            sharedBundles = config.sharedBundles === false ? false : true;
+            canonicalUrl = config.canonicalUrl && urlTools.ensureTrailingSlash(config.canonicalUrl);
 
         // Support for locales
         var localeIds;
@@ -39,57 +67,24 @@ module.exports = function (grunt) {
             });
         }
 
-        var loadAssets = [
-            '*.html',
-            '.htaccess',
-            '*.txt',
-            '*.ico'
-        ];
-
-        if (config.include) {
-            loadAssets = config.include;
-        }
-
-        var browsers = [
-            '> 1%',
-            'last 2 versions',
-            'Firefox ESR',
-            'Opera 12.1'
-        ];
-
-        if (config.autoprefix) {
-            grunt.log.writeln(chalk.yellow(' ⚠ The "autoprefix" property has been deprecated and replaced with "browsers". Please update your grunt-reduce config.'));
-            browsers = config.autoprefix;
-        }
-
-        if (config.browsers) {
-            browsers = config.browsers;
-        }
-
         new AssetGraph({ root: rootUrl })
             .logEvents()
             .registerRequireJsConfig()
-            .loadAssets(loadAssets)
+            .loadAssets(config.loadAssets)
             .buildProduction({
                 recursive: true,
                 canonicalUrl: canonicalUrl,
-                browsers: browsers,
-                less: less,
-                scss: scss,
-                optimizeImages: optimizeImages,
-                inlineSize: config.inlineSize === 0 ? 0 : (config.inlineSize || 4096),
-                inlineByRelationType: {
-                    "*" : true,
-                    "CssImage" : Number.MAX_VALUE,
-                    "HtmlScript" : Number.MAX_VALUE,
-                    "HtmlImage" : Number.MAX_VALUE,
-                    "Css" : Number.MAX_VALUE
-                },
+                browsers: config.browsers,
+                less: config.less,
+                scss: config.scss,
+                optimizeImages: config.optimizeImages,
+                inlineSize: config.inlineSize,
+                inlineByRelationType: config.inlineByRelationType,
                 manifest: config.manifest,
-                asyncScripts: asyncScripts,
+                asyncScripts: config.asyncScripts,
                 cdnRoot: cdnRoot,
-                noCompress: config.pretty || false,
-                sharedBundles: sharedBundles,
+                noCompress: config.pretty,
+                sharedBundles: config.sharedBundles,
                 stripDebug: !(config.pretty || false),
                 localeIds: localeIds
             })
