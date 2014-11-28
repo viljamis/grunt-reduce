@@ -78,7 +78,14 @@ module.exports = function (grunt) {
                 scss: scss,
                 optimizeImages: optimizeImages,
                 inlineSize: config.inlineSize === 0 ? 0 : (config.inlineSize || 4096),
-                manifest: config.manifest || false,
+                inlineByRelationType: {
+                    "*" : true,
+                    "CssImage" : Number.MAX_VALUE,
+                    "HtmlScript" : Number.MAX_VALUE,
+                    "HtmlImage" : Number.MAX_VALUE,
+                    "Css" : Number.MAX_VALUE
+                },
+                manifest: config.manifest,
                 asyncScripts: asyncScripts,
                 cdnRoot: cdnRoot,
                 noCompress: config.pretty || false,
