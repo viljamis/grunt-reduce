@@ -28,7 +28,6 @@ var defaults = {
     asyncScripts : false,
     loadAssets : [
         '*.html',
-        '.htaccess',
         '*.txt',
         '*.ico'
     ],
@@ -71,7 +70,6 @@ module.exports = function (grunt) {
             .logEvents()
             .registerRequireJsConfig()
             .loadAssets(config.loadAssets)
-            .prettyPrintAssets({type: ['Html']})
             .buildProduction({
                 recursive: true,
                 canonicalUrl: canonicalUrl,
@@ -89,6 +87,7 @@ module.exports = function (grunt) {
                 stripDebug: !(config.pretty || false),
                 localeIds: localeIds
             })
+            .prettyPrintAssets({type: ['Html']})
             .writeAssetsToDisc({url: /^file:/, isLoaded: true}, outRoot)
             .if(cdnRoot)
                 .writeAssetsToDisc({url: query.createPrefixMatcher(cdnRoot), isLoaded: true}, cdnOutRoot || outRoot, cdnRoot)
