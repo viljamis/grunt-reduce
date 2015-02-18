@@ -71,6 +71,7 @@ module.exports = function (grunt) {
             .logEvents()
             .registerRequireJsConfig()
             .loadAssets(config.loadAssets)
+            .prettyPrintAssets({type: ['Html']})
             .buildProduction({
                 recursive: true,
                 canonicalUrl: canonicalUrl,
