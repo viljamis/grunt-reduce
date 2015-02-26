@@ -87,8 +87,7 @@ module.exports = function (grunt) {
                 stripDebug: !(config.pretty || false),
                 localeIds: localeIds
             })
-            .minifyAssets(['Html'])
-            .prettyPrintAssets({type: ['Html']})
+            //.prettyPrintAssets({type: ['Html']})
             .writeAssetsToDisc({url: /^file:/, isLoaded: true}, outRoot)
             .if(cdnRoot)
                 .writeAssetsToDisc({url: query.createPrefixMatcher(cdnRoot), isLoaded: true}, cdnOutRoot || outRoot, cdnRoot)
