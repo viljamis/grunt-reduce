@@ -73,7 +73,7 @@ module.exports = function (grunt) {
             .buildProduction({
                 recursive: true,
                 canonicalUrl: canonicalUrl,
-                browsers: config.browsers,
+                //browsers: config.browsers,
                 less: config.less,
                 scss: config.scss,
                 optimizeImages: config.optimizeImages,
@@ -87,6 +87,7 @@ module.exports = function (grunt) {
                 stripDebug: !(config.pretty || false),
                 localeIds: localeIds
             })
+            .minifyAssets(['Html'])
             .prettyPrintAssets({type: ['Html']})
             .writeAssetsToDisc({url: /^file:/, isLoaded: true}, outRoot)
             .if(cdnRoot)
